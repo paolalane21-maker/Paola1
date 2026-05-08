@@ -1,10 +1,62 @@
-from flask import Flask, render_template, request, jsonify # type: ignore
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for # type: ignore
 import math
 import datetime
+import sqlite3
+import os
+import json
 from dataclasses import dataclass, field
 from typing import Literal
+from functools import wraps
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+
+# Database setup
+DB_PATH = "users.db"
+DATA_DIR = "user_data"
+
+if not os.path.exists(DATA_DIR):
+    os.makedirs(DATA_DIR)
+
+def init_db():
+    """Inicializa la base de datos de usuarios"""
+    if not os.path.exists(DB_PATH):
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute('''CREATE TABLE users
+                     (id INTEGER PRIMARY KEY, username TEXT UNIQUE, password TEXT)''')
+        conn.commit()
+        conn.close()
+
+def login_required(f):
+    """Decorador para proteger rutas"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return jsonify({"error": "No autenticado"}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+def get_user_db_path(user_id):
+    """Obtiene la ruta de la base de datos del usuario"""
+    return os.path.join(DATA_DIR, f"user_{user_id}.db")
+
+def init_user_db(user_id):
+    """Inicializa la base de datos personal del usuario"""
+    db_path = get_user_db_path(user_id)
+    if not os.path.exists(db_path):
+        conn = sqlite3.connect(db_path)
+        c = conn.cursor()
+        c.execute('''CREATE TABLE asignaturas
+                     (id INTEGER PRIMARY KEY, codigo TEXT, nombre TEXT, creditos REAL, 
+                      calificacion TEXT, semestre TEXT)''')
+        c.execute('''CREATE TABLE planes_fpf
+                     (id INTEGER PRIMARY KEY, periodo TEXT, año INTEGER, num_cuatrimestres INTEGER, 
+                      fecha_creacion TEXT)''')
+        conn.commit()
+        conn.close()
+
+init_db()
 
 # ─────────────────────────────────────────────────────
 # LÓGICA ACADÉMICA
@@ -240,14 +292,89 @@ def calcular_notas(notas, semanas, politica):
 
 
 # ─────────────────────────────────────────────────────
-# RUTAS
+# RUTAS - AUTENTICACIÓN
+# ─────────────────────────────────────────────────────
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+    
+    data = request.json
+    username = data.get("username", "").strip()
+    password = data.get("password", "").strip()
+    
+    if not username or not password:
+        return jsonify({"error": "Usuario y contraseña requeridos"}), 400
+    
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT id, password FROM users WHERE username = ?", (username,))
+    user = c.fetchone()
+    conn.close()
+    
+    if user and user[1] == password:  # En producción, usar hash
+        session['user_id'] = user[0]
+        session['username'] = username
+        init_user_db(user[0])
+        return jsonify({"success": True, "message": "Login exitoso"})
+    
+    return jsonify({"error": "Usuario o contraseña incorrectos"}), 401
+
+@app.route("/register", methods=["POST"])
+def register():
+    data = request.json
+    username = data.get("username", "").strip()
+    password = data.get("password", "").strip()
+    password_confirm = data.get("password_confirm", "").strip()
+    
+    if not username or not password:
+        return jsonify({"error": "Usuario y contraseña requeridos"}), 400
+    
+    if password != password_confirm:
+        return jsonify({"error": "Las contraseñas no coinciden"}), 400
+    
+    if len(password) < 6:
+        return jsonify({"error": "La contraseña debe tener al menos 6 caracteres"}), 400
+    
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    try:
+        c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+        conn.commit()
+        user_id = c.lastrowid
+        conn.close()
+        
+        init_user_db(user_id)
+        session['user_id'] = user_id
+        session['username'] = username
+        return jsonify({"success": True, "message": "Cuenta creada"})
+    except sqlite3.IntegrityError:
+        conn.close()
+        return jsonify({"error": "El usuario ya existe"}), 400
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    session.clear()
+    return jsonify({"success": True})
+
+@app.route("/check_session")
+def check_session():
+    if 'user_id' in session:
+        return jsonify({"authenticated": True, "username": session.get('username')})
+    return jsonify({"authenticated": False})
+
+# ─────────────────────────────────────────────────────
+# RUTAS - PRINCIPALES
 # ─────────────────────────────────────────────────────
 @app.route("/")
 def index():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     return render_template("index.html")
 
 
 @app.route("/api/calcular_indice", methods=["POST"])
+@login_required
 def api_calcular_indice():
     data = request.json
     filas = data.get("asignaturas", [])
@@ -263,6 +390,7 @@ def api_calcular_indice():
 
 
 @app.route("/api/calcular_notas", methods=["POST"])
+@login_required
 def api_calcular_notas():
     data = request.json
     try:
@@ -276,6 +404,7 @@ def api_calcular_notas():
 
 
 @app.route("/api/calcular_costos", methods=["POST"])
+@login_required
 def api_calcular_costos():
     data = request.json
     try:
@@ -292,6 +421,7 @@ def api_calcular_costos():
 
 
 @app.route("/api/calcular_fpf", methods=["POST"])
+@login_required
 def api_calcular_fpf():
     data = request.json
     try:
@@ -308,6 +438,7 @@ def api_calcular_fpf():
 
 
 @app.route("/api/calcular_horas_creditos", methods=["POST"])
+@login_required
 def api_calcular_horas_creditos():
     data = request.json
     try:

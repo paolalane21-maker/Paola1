@@ -275,6 +275,55 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--m
   font-size: 11px; font-weight: 600; background: var(--blue); color: white;
   padding: 3px 10px; border-radius: 20px; letter-spacing: .3px;
 }
+.user-menu { position: relative; display: flex; align-items: center; }
+.user-button {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px; background: #f8fafc;
+  border: 1.5px solid var(--card-border);
+  border-radius: 8px; cursor: pointer;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-primary); transition: all var(--transition);
+}
+.user-button:hover {
+  background: #f1f5f9; border-color: var(--blue);
+  box-shadow: 0 2px 8px rgba(37,99,235,.15);
+}
+.user-avatar {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 700; font-size: 12px;
+}
+.user-dropdown {
+  position: absolute; top: calc(100% + 6px); right: 0;
+  background: var(--card-bg); border: 1.5px solid var(--card-border);
+  border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  min-width: 200px; opacity: 0; pointer-events: none;
+  transform: translateY(-8px); transition: opacity var(--transition), transform var(--transition);
+  z-index: 1000; overflow: hidden;
+}
+.user-dropdown.open {
+  opacity: 1; pointer-events: all;
+  transform: translateY(0);
+}
+.dropdown-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+  color: var(--text-primary); font-size: 13px; font-weight: 500;
+  transition: background var(--transition), color var(--transition);
+}
+.dropdown-item:last-child { border-bottom: none; }
+.dropdown-item:hover {
+  background: #f8fafc; color: var(--blue);
+}
+.dropdown-item.danger:hover {
+  background: var(--red-light); color: var(--red);
+}
+.dropdown-item svg {
+  width: 16px; height: 16px; opacity: 0.6;
+}
+.dropdown-item.danger svg { opacity: 0.8; }
 
 .content { flex: 1; overflow-y: auto; padding: 28px; }
 
@@ -377,6 +426,7 @@ tbody tr:last-child td { border-bottom: none; }
 .badge-purple { background: var(--purple-light); color: var(--purple); }
 .badge-gray { background: #f1f5f9; color: var(--text-muted); }
 .badge-teal { background: var(--teal-light); color: var(--teal); }
+.badge-pink { background: #fbf0f9; color: #d946a6; }
 
 .result-box {
   background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
@@ -759,6 +809,11 @@ tr.row-sin_fecha td { background: #fffbeb; }
         <span class="nav-label">Reglas</span>
         <span class="nav-tooltip">Reglas</span>
       </div>
+      <div class="nav-item" data-nav="politicas" onclick="showPage('politicas', this)">
+        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="19" x2="12" y2="5"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+        <span class="nav-label">Políticas</span>
+        <span class="nav-tooltip">Políticas</span>
+      </div>
     </div>
   </div>
 
@@ -798,6 +853,27 @@ tr.row-sin_fecha td { background: #fffbeb; }
     <div class="topbar-title" id="topbar-title">Dashboard</div>
     <div class="topbar-spacer"></div>
     <div class="topbar-badge">Sistema Académico v2.0</div>
+    <div class="user-menu">
+      <button class="user-button" onclick="toggleUserMenu()">
+        <div class="user-avatar" id="user-avatar">MP</div>
+        <span id="user-name">Usuario</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2" style="opacity: 0.6;"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="user-dropdown" id="user-dropdown">
+        <div class="dropdown-item" onclick="showUserProfile()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Mi Perfil</span>
+        </div>
+        <div class="dropdown-item" onclick="showAccountSettings()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"/></svg>
+          <span>Configuración</span>
+        </div>
+        <div class="dropdown-item danger" onclick="logout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Cerrar Sesión</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="content">
@@ -1205,6 +1281,37 @@ tr.row-sin_fecha td { background: #fffbeb; }
       </div>
     </div>
 
+    <!-- ══ POLÍTICAS ══ -->
+    <div class="page" id="page-politicas">
+      <div class="dash-welcome" style="font-size:18px;margin-bottom:4px;">Registro de Políticas</div>
+      <div class="dash-sub">Gestión y seguimiento de políticas vigentes de la institución</div>
+      <div class="reglas-stats-bar" id="politicas-stats-bar">
+        <div class="regla-stat-card"><div class="regla-stat-icon icon-blue"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="regla-stat-num" id="pstat-total" style="color:var(--blue);">0</div><div class="regla-stat-lbl">Total Políticas</div></div></div>
+        <div class="regla-stat-card"><div class="regla-stat-icon icon-green"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="regla-stat-num" id="pstat-vigentes" style="color:var(--green);">0</div><div class="regla-stat-lbl">Vigentes</div></div></div>
+        <div class="regla-stat-card"><div class="regla-stat-icon icon-amber"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="regla-stat-num" id="pstat-revision" style="color:var(--amber);">0</div><div class="regla-stat-lbl">En Revisión</div></div></div>
+        <div class="regla-stat-card"><div class="regla-stat-icon icon-red"><svg viewBox="0 0 24 24" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div><div class="regla-stat-num" id="pstat-derogadas" style="color:var(--red);">0</div><div class="regla-stat-lbl">Derogadas</div></div></div>
+        <div class="regla-stat-card"><div class="regla-stat-icon icon-teal"><svg viewBox="0 0 24 24" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div><div class="regla-stat-num" id="pstat-este-mes" style="color:var(--teal);">0</div><div class="regla-stat-lbl">Este Mes</div></div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+        <button class="btn btn-primary" onclick="abrirModalPolitica()"><svg viewBox="0 0 24 24" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nueva Política</button>
+        <button class="btn btn-success" onclick="exportarPoliticasExcel()"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Exportar Excel</button>
+        <div style="flex:1;min-width:180px;"><input type="text" id="politicas-search" placeholder="🔍 Buscar política, descripción, área…" oninput="politicasFiltrarRender()" style="font-size:13px;"></div>
+        <select id="politicas-filtro-estado" onchange="politicasFiltrarRender()" style="width:auto;min-width:140px;font-size:13px;"><option value="">Todos los estados</option><option value="vigente">Vigente</option><option value="revision">En Revisión</option><option value="suspendida">Suspendida</option><option value="derogada">Derogada</option></select>
+        <select id="politicas-filtro-area" onchange="politicasFiltrarRender()" style="width:auto;min-width:140px;font-size:13px;"><option value="">Todas las áreas</option></select>
+      </div>
+      <div class="panel">
+        <div class="panel-header" style="justify-content:space-between;"><span class="panel-title">📋 Registro de Políticas</span><span id="politicas-count-label" style="font-size:12px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;"></span></div>
+        <div class="panel-body" style="padding:0;">
+          <div class="table-wrap">
+            <table id="politicas-table">
+              <thead><tr><th style="width:44px;">#</th><th>Nombre / Política</th><th>Descripción</th><th>Área</th><th>Responsable</th><th>Fecha Vigencia</th><th>Vigencia Hasta</th><th>Estado</th><th style="width:90px;">Acciones</th></tr></thead>
+              <tbody id="politicas-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ══ HORAS CRÉDITOS ══ -->
     <div class="page" id="page-horas">
       <div class="dash-welcome" style="font-size:18px;margin-bottom:4px;">Cálculo de Horas a Créditos</div>
@@ -1491,6 +1598,48 @@ tr.row-sin_fecha td { background: #fffbeb; }
           <button class="btn btn-secondary" onclick="cerrarModalRegla()">Cancelar</button>
           <button class="btn btn-danger" id="regla-btn-eliminar" onclick="eliminarRegla()" style="display:none;"><svg viewBox="0 0 24 24" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Eliminar</button>
           <button class="btn btn-primary" onclick="guardarRegla()"><svg viewBox="0 0 24 24" stroke-width="2" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>Guardar Regla</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MODAL POLÍTICA ══ -->
+    <div class="modal-overlay" id="politica-modal" onclick="cerrarModalPoliticaSiFondo(event)">
+      <div class="modal">
+        <div class="modal-header">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:32px;height:32px;border-radius:8px;background:var(--purple-light);display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--purple)" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <span class="modal-title" id="politica-modal-title">Nueva Política</span>
+          </div>
+          <button class="modal-close" onclick="cerrarModalPolitica()">×</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="politica-edit-id">
+          <div style="margin-bottom:12px;"><label class="field-label">Nombre / Título de la Política *</label><input type="text" id="politica-nombre" placeholder="ej. Política de Asistencia Estudiantil"></div>
+          <div style="margin-bottom:12px;"><label class="field-label">Descripción</label><textarea id="politica-descripcion" rows="3" style="width:100%;padding:8px 12px;font-size:13px;border:1.5px solid var(--card-border);border-radius:var(--radius-sm);font-family:inherit;resize:vertical;outline:none;" placeholder="Detalla el contenido, objetivos y aplicación de esta política…"></textarea></div>
+          <div class="form-grid form-grid-2" style="margin-bottom:12px;">
+            <div><label class="field-label">Área / Departamento *</label><input type="text" id="politica-area" placeholder="ej. Asuntos Académicos, Recursos Humanos"></div>
+            <div><label class="field-label">Responsable *</label><input type="text" id="politica-responsable" placeholder="ej. Dr. Juan Pérez"></div>
+          </div>
+          <div class="form-grid form-grid-2" style="margin-bottom:12px;">
+            <div><label class="field-label">Fecha de Vigencia *</label><input type="date" id="politica-fecha-vigencia"></div>
+            <div><label class="field-label">Vigencia Hasta (opcional)</label><input type="date" id="politica-fecha-fin"></div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <label class="field-label">Estado</label>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;">
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-weight:500;"><input type="radio" name="politica-estado" value="vigente" checked><span class="badge badge-green">Vigente</span></label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-weight:500;"><input type="radio" name="politica-estado" value="revision"><span class="badge badge-amber">En Revisión</span></label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-weight:500;"><input type="radio" name="politica-estado" value="suspendida"><span class="badge badge-gray">Suspendida</span></label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-weight:500;"><input type="radio" name="politica-estado" value="derogada"><span class="badge badge-red">Derogada</span></label>
+            </div>
+          </div>
+          <div><label class="field-label">Notas / Observaciones</label><textarea id="politica-notas" rows="2" style="width:100%;padding:8px 12px;font-size:13px;border:1.5px solid var(--card-border);border-radius:var(--radius-sm);font-family:inherit;resize:vertical;outline:none;" placeholder="Cambios, historial, referencias…"></textarea></div>
+          <div id="politica-modal-error" class="alert alert-error hidden" style="margin-top:12px;"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="cerrarModalPolitica()">Cancelar</button>
+          <button class="btn btn-danger" id="politica-btn-eliminar" onclick="eliminarPolitica()" style="display:none;"><svg viewBox="0 0 24 24" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Eliminar</button>
+          <button class="btn btn-primary" onclick="guardarPolitica()"><svg viewBox="0 0 24 24" stroke-width="2" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>Guardar Política</button>
         </div>
       </div>
     </div>
@@ -1794,6 +1943,69 @@ function exportarReglasExcel() {
 }
 
 // ══════════════════════════════════════════════════════
+// POLÍTICAS
+// ══════════════════════════════════════════════════════
+const politicasState = {
+  lista: JSON.parse(localStorage.getItem('mpcontrol_politicas') || '[]'),
+  nextId: parseInt(localStorage.getItem('mpcontrol_politicas_id') || '1'),
+};
+function politicasSave() { localStorage.setItem('mpcontrol_politicas', JSON.stringify(politicasState.lista)); localStorage.setItem('mpcontrol_politicas_id', politicasState.nextId); }
+function politicasActualizarFiltroArea() { const sel=document.getElementById('politicas-filtro-area'); const valorActual=sel.value; const areas=[...new Set(politicasState.lista.map(p=>p.area).filter(Boolean))].sort(); sel.innerHTML='<option value="">Todas las áreas</option>'; areas.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;sel.appendChild(o);}); sel.value=valorActual; }
+function politicasActualizarStats() {
+  const hoy=new Date(), mesActual=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
+  const vigentes=politicasState.lista.filter(p=>p.estado==='vigente').length, revision=politicasState.lista.filter(p=>p.estado==='revision').length, derogadas=politicasState.lista.filter(p=>p.estado==='derogada').length, esteMes=politicasState.lista.filter(p=>p.fechaVigencia&&p.fechaVigencia.startsWith(mesActual)).length;
+  document.getElementById('pstat-total').textContent=politicasState.lista.length; document.getElementById('pstat-vigentes').textContent=vigentes;
+  document.getElementById('pstat-revision').textContent=revision; document.getElementById('pstat-derogadas').textContent=derogadas; document.getElementById('pstat-este-mes').textContent=esteMes;
+}
+function politicasFiltrarRender() {
+  const q=(document.getElementById('politicas-search')?.value||'').toLowerCase(), filtroEst=document.getElementById('politicas-filtro-estado')?.value||'', filtroArea=document.getElementById('politicas-filtro-area')?.value||'';
+  const lista=politicasState.lista.filter(p=>{const matchEst=!filtroEst||p.estado===filtroEst;const matchArea=!filtroArea||p.area===filtroArea;const matchQ=!q||[p.nombre,p.descripcion,p.responsable,p.area,p.notas].some(v=>(v||'').toLowerCase().includes(q));return matchEst&&matchArea&&matchQ;});
+  const tbody=document.getElementById('politicas-tbody'), label=document.getElementById('politicas-count-label');
+  if(label) label.textContent=`${lista.length} de ${politicasState.lista.length} registro${politicasState.lista.length!==1?'s':''}`;
+  const estadoBadge={vigente:'badge-green',revision:'badge-amber',suspendida:'badge-gray',derogada:'badge-red'}, estadoLabel={vigente:'Vigente',revision:'En Revisión',suspendida:'Suspendida',derogada:'Derogada'};
+  if(!lista.length){tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:36px;color:var(--text-muted);">No hay políticas que coincidan con los filtros.</td></tr>`;return;}
+  tbody.innerHTML=lista.map((p,i)=>{const badgeCls=estadoBadge[p.estado]||'badge-gray',est=estadoLabel[p.estado]||p.estado,descCorta=p.descripcion?(p.descripcion.length>60?p.descripcion.slice(0,60)+'…':p.descripcion):'—';return `<tr><td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--text-muted);text-align:center;">${i+1}</td><td><div style="font-weight:700;color:var(--text-primary);font-size:13px;">${escHtml(p.nombre)}</div></td><td style="font-size:12px;color:var(--text-secondary);max-width:200px;">${escHtml(descCorta)}</td><td>${p.area?`<span class="badge badge-pink" style="font-size:10.5px;">${escHtml(p.area)}</span>`:'<span style="color:var(--text-muted);font-size:12px;">—</span>'}</td><td style="font-size:12.5px;font-weight:600;"><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:var(--purple-light);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--purple);flex-shrink:0;">${escHtml((p.responsable||'?')[0].toUpperCase())}</div>${escHtml(p.responsable||'—')}</div></td><td style="font-family:'JetBrains Mono',monospace;font-size:12px;white-space:nowrap;">${p.fechaVigencia?fmtDate(p.fechaVigencia):'—'}</td><td style="font-family:'JetBrains Mono',monospace;font-size:12px;white-space:nowrap;">${p.fechaFin?fmtDate(p.fechaFin):'Sin límite'}</td><td><span class="badge ${badgeCls}">${est}</span></td><td><button class="regla-accion-btn edit" onclick="abrirModalPolitica(${p.id})">✏️ Editar</button></td></tr>`;}).join('');
+}
+function politicasRender() { politicasActualizarStats(); politicasActualizarFiltroArea(); politicasFiltrarRender(); }
+function abrirModalPolitica(id) {
+  const modal=document.getElementById('politica-modal'), btnEl=document.getElementById('politica-btn-eliminar'); hideEl('politica-modal-error');
+  ['politica-nombre','politica-descripcion','politica-area','politica-responsable','politica-fecha-vigencia','politica-fecha-fin','politica-notas'].forEach(fId=>{const el=document.getElementById(fId);if(el)el.value='';});
+  document.getElementById('politica-fecha-vigencia').value=new Date().toISOString().slice(0,10);
+  document.querySelector('input[name="politica-estado"][value="vigente"]').checked=true;
+  if(id!==undefined){const p=politicasState.lista.find(x=>x.id===id);if(!p)return;document.getElementById('politica-modal-title').textContent='Editar Política';document.getElementById('politica-edit-id').value=id;document.getElementById('politica-nombre').value=p.nombre||'';document.getElementById('politica-descripcion').value=p.descripcion||'';document.getElementById('politica-area').value=p.area||'';document.getElementById('politica-responsable').value=p.responsable||'';document.getElementById('politica-fecha-vigencia').value=p.fechaVigencia||'';document.getElementById('politica-fecha-fin').value=p.fechaFin||'';document.getElementById('politica-notas').value=p.notas||'';const radio=document.querySelector(`input[name="politica-estado"][value="${p.estado}"]`);if(radio)radio.checked=true;btnEl.style.display='flex';}
+  else{document.getElementById('politica-modal-title').textContent='Nueva Política';document.getElementById('politica-edit-id').value='';btnEl.style.display='none';}
+  modal.classList.add('open');
+}
+function cerrarModalPolitica() { document.getElementById('politica-modal').classList.remove('open'); }
+function cerrarModalPoliticaSiFondo(e) { if(e.target.id==='politica-modal') cerrarModalPolitica(); }
+function guardarPolitica() {
+  const nombre=document.getElementById('politica-nombre').value.trim(), area=document.getElementById('politica-area').value.trim(), responsable=document.getElementById('politica-responsable').value.trim(), fechaVigencia=document.getElementById('politica-fecha-vigencia').value;
+  if(!nombre){showError('politica-modal-error','El nombre de la política es obligatorio.');return;}
+  if(!area){showError('politica-modal-error','El área es obligatoria.');return;}
+  if(!responsable){showError('politica-modal-error','El responsable es obligatorio.');return;}
+  if(!fechaVigencia){showError('politica-modal-error','La fecha de vigencia es obligatoria.');return;}
+  const estado=document.querySelector('input[name="politica-estado"]:checked')?.value||'vigente', editId=document.getElementById('politica-edit-id').value;
+  const datos={nombre,descripcion:document.getElementById('politica-descripcion').value.trim(),area,responsable,fechaVigencia,fechaFin:document.getElementById('politica-fecha-fin').value||null,notas:document.getElementById('politica-notas').value.trim(),estado};
+  if(editId){const idx=politicasState.lista.findIndex(p=>p.id===parseInt(editId));if(idx>=0)politicasState.lista[idx]={...politicasState.lista[idx],...datos,modificadoEn:new Date().toISOString().slice(0,10)};}
+  else{datos.id=politicasState.nextId++;datos.creadoEn=new Date().toISOString().slice(0,10);politicasState.lista.unshift(datos);}
+  politicasSave(); cerrarModalPolitica(); politicasRender();
+}
+function eliminarPolitica() {
+  const editId=parseInt(document.getElementById('politica-edit-id').value);
+  if(!confirm('¿Eliminar esta política permanentemente?'))return;
+  politicasState.lista=politicasState.lista.filter(p=>p.id!==editId); politicasSave(); cerrarModalPolitica(); politicasRender();
+}
+function exportarPoliticasExcel() {
+  if(!politicasState.lista.length){alert('No hay políticas para exportar.');return;}
+  const XLSX=window.XLSX, wb=XLSX.utils.book_new();
+  const estadoLabel={vigente:'Vigente',revision:'En Revisión',suspendida:'Suspendida',derogada:'Derogada'};
+  const filas=politicasState.lista.map((p,i)>({'#':i+1,'Nombre/Política':p.nombre,'Descripción':p.descripcion||'','Área':p.area||'','Responsable':p.responsable||'','Fecha Vigencia':p.fechaVigencia?fmtDate(p.fechaVigencia):'','Vigencia Hasta':p.fechaFin?fmtDate(p.fechaFin):'Sin límite','Estado':estadoLabel[p.estado]||p.estado,'Notas':p.notas||'','Creado':p.creadoEn||'','Modificado':p.modificadoEn||''}));
+  const ws=XLSX.utils.json_to_sheet(filas); ws['!cols']=[{wch:4},{wch:40},{wch:50},{wch:24},{wch:24},{wch:14},{wch:14},{wch:14},{wch:50},{wch:14},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws,'Políticas');
+  XLSX.writeFile(wb,`Politicas_MPControl_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+// ══════════════════════════════════════════════════════
 // NAV GROUP FLYOUT
 // ══════════════════════════════════════════════════════
 let _flyTimer = null;
@@ -1826,11 +2038,12 @@ function showPage(id, el) {
     dashboard:'Dashboard', calculadora:'Calculadora Académica', indice:'Índice Académico',
     asignaturas:'Mantenimiento de Asignaturas', fpf:'Fecha Probable de Finalización',
     costos:'Cálculo de Costos', proyectos:'Registro de Proyectos', agenda:'Agenda y Minutas de Reuniones',
-    reglas:'Registro de Reglas', calendario:'Calendario de Procesos',
+    reglas:'Registro de Reglas', politicas:'Registro de Políticas', calendario:'Calendario de Procesos',
   };
   document.getElementById('topbar-title').textContent=titles[id]||id;
   hideFlyout();
   if(id==='reglas') reglasRender();
+  if(id==='politicas') politicasRender();
   if(id==='calendario') { calRenderMes(); calActualizarStats(); }
   if(id==='agenda') agendaRender();
 }
@@ -2146,6 +2359,58 @@ function generarPDFMinuta(agenda){
 }
 
 // ══════════════════════════════════════════════════════
+// USUARIO - MENÚ Y LOGOUT
+// ══════════════════════════════════════════════════════
+function updateUserDisplay() {
+  const username = sessionStorage.getItem('username') || 'Usuario';
+  document.getElementById('user-name').textContent = username;
+  const initials = username.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'MP';
+  document.getElementById('user-avatar').textContent = initials;
+}
+
+function toggleUserMenu() {
+  const dropdown = document.getElementById('user-dropdown');
+  dropdown.classList.toggle('open');
+  document.addEventListener('click', closeUserMenuOnClickOutside);
+}
+
+function closeUserMenuOnClickOutside(e) {
+  const menu = document.getElementById('user-menu');
+  if (!menu.contains(e.target)) {
+    document.getElementById('user-dropdown').classList.remove('open');
+    document.removeEventListener('click', closeUserMenuOnClickOutside);
+  }
+}
+
+function showUserProfile() {
+  alert('👤 Perfil de Usuario\n\nNombre: ' + (sessionStorage.getItem('username') || 'Usuario') + '\n\nFuncionalidad de edición de perfil próximamente.');
+  document.getElementById('user-dropdown').classList.remove('open');
+}
+
+function showAccountSettings() {
+  alert('⚙️ Configuración de Cuenta\n\nOpciones:\n• Cambiar contraseña\n• Preferencias de notificaciones\n• Configuración de privacidad\n\nFuncionalidad disponible próximamente.');
+  document.getElementById('user-dropdown').classList.remove('open');
+}
+
+async function logout() {
+  if (!confirm('¿Estás seguro de que deseas cerrar sesión?')) return;
+  
+  try {
+    const response = await fetch('/logout', { method: 'POST' });
+    if (response.ok) {
+      sessionStorage.clear();
+      localStorage.clear();
+      window.location.href = '/login';
+    } else {
+      alert('Error al cerrar sesión.');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error de conexión.');
+  }
+}
+
+// ══════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════
 async function post(url,data){try{const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});return await res.json();}catch(e){return{error:e.message};}}
@@ -2163,6 +2428,7 @@ setInterval(updateClock,1000);updateClock();
 // INIT
 // ══════════════════════════════════════════════════════
 async function init() {
+  updateUserDisplay();
   const pr=await fetch('/api/periodos').then(r=>r.json()).catch(()=>({periodos:[]}));
   const sel=document.getElementById('fpf-periodo');
   pr.periodos.forEach(p=>{const o=document.createElement('option');o.textContent=p;sel.appendChild(o);});
